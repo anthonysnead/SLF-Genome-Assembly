@@ -1,0 +1,9 @@
+#!/bin/bash
+#SBATCH --job-name Hap1_RepeatMasker
+#SBATCH --cpus-per-task 48
+#SBATCH --mem=100GB
+#SBATCH --time=1-00:00:00
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/tetools_v1.87.sif \
+RepeatMasker -s -pa 48 -lib /scratch/work/winchell/Lanternfly/Genome2/Assembly/Masked/Hap1/Database/Lanternfly-families.fa \
+-dir /scratch/work/winchell/Lanternfly/Genome2/Assembly/Masked/Hap1/Softmask -poly -excln -xsmall -gff /scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap1/SLF_Hap1.fasta

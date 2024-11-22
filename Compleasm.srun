@@ -1,0 +1,177 @@
+#!/bin/sh
+#SBATCH --job-name=SLF_BUSCO
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=32
+#SBATCH --mem=100GB
+#SBATCH --time=10:00:00
+
+singularity exec Containers/compleasm.sif \
+    python Containers/compleasm/compleasm.py download \
+    eukaryota arthropoda insecta \
+    -L Busco_DB
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/hifiasm/delivery/purged.fa \
+-l eukaryota_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_PreScaffold/Eukaryota
+ 
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/hifiasm/delivery/purged.fa \
+-l arthropoda_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_PreScaffold/Arthropoda   
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/hifiasm/delivery/purged.fa \
+-l insecta_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_PreScaffold/Insecta   
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/HAP1/jordan-zhang-dtg-kea4292-hap1-mb-hirise-jktx1__03-04-2024__final_assembly.fasta \
+-l eukaryota_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Scaffold/Hap1/Eukaryota 
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/HAP1/jordan-zhang-dtg-kea4292-hap1-mb-hirise-jktx1__03-04-2024__final_assembly.fasta \
+-l arthropoda_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Scaffold/Hap1/Arthropoda   
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/HAP1/jordan-zhang-dtg-kea4292-hap1-mb-hirise-jktx1__03-04-2024__final_assembly.fasta \
+-l insecta_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Scaffold/Hap1/Insecta   
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/HAP2/jordan-kea4292-mb-hirise-yqrtc__03-04-2024__final_assembly.fasta \
+-l eukaryota_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Scaffold/Hap2/Eukaryota 
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/HAP2/jordan-kea4292-mb-hirise-yqrtc__03-04-2024__final_assembly.fasta \
+-l arthropoda_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Scaffold/Hap2/Arthropoda   
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/HAP2/jordan-kea4292-mb-hirise-yqrtc__03-04-2024__final_assembly.fasta \
+-l insecta_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Scaffold/Hap2/Insecta   
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap1/SLF_HAP1_13CHR.fasta \
+-l eukaryota_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Final/Hap1/Eukaryota 
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap1/SLF_HAP1_13CHR.fasta \
+-l arthropoda_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Final/Hap1/Arthropoda   
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap1/SLF_HAP1_13CHR.fasta \
+-l insecta_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Final/Hap1/Insecta   
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap2/SLF_HAP2_13CHR.fasta \
+-l eukaryota_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Final/Hap2/Eukaryota 
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap2/SLF_HAP2_13CHR.fasta \
+-l arthropoda_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Final/Hap2/Arthropoda   
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py run \
+-a /scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap2/SLF_HAP2_13CHR.fasta \
+-l insecta_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Final/Hap2/Insecta   
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py protein \
+-p /scratch/work/winchell/Lanternfly/Genome2/Annotation/Hap1/Functional/Hap1.faa \
+-l eukaryota_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Annotation/Hap1/Eukaryota   
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py protein \
+-p /scratch/work/winchell/Lanternfly/Genome2/Annotation/Hap1/Functional/Hap1.faa \
+-l arthropoda_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Annotation/Hap1/Arthropoda
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py protein \
+-p /scratch/work/winchell/Lanternfly/Genome2/Annotation/Hap1/Functional/Hap1.faa \
+-l insecta_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Annotation/Hap1/Insecta  
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py protein \
+-p /scratch/work/winchell/Lanternfly/Genome2/Annotation/Hap2/Functional/Hap2.faa \
+-l eukaryota_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Annotation/Hap2/Eukaryota 
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py protein \
+-p /scratch/work/winchell/Lanternfly/Genome2/Annotation/Hap2/Functional/Hap2.faa \
+-l arthropoda_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Annotation/Hap2/Arthropoda
+
+singularity exec Containers/compleasm.sif \
+python Containers/compleasm/compleasm.py protein \
+-p /scratch/work/winchell/Lanternfly/Genome2/Annotation/Hap2/Functional/Hap2.faa \
+-l insecta_odb10 \
+-t 32 \
+-L Busco_DB \
+-o Quality/Busco/SLF_Annotation/Hap2/Insecta

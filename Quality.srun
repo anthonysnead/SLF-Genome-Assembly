@@ -1,0 +1,58 @@
+#!/bin/sh
+#SBATCH --job-name=SLF_Genome_stats
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --mem=50GB
+#SBATCH --time=05:00:00
+
+cd /scratch/work/winchell/Lanternfly/Genome2/Quality/Stats
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/gfastats_v1.3.8.sif \
+gfastats /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/hifiasm/delivery/Lycorma_delicatula.p_ctg.fa \
+-j 8 \
+-t \
+--nstar-report \
+--stats > hifiasm.stats
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/gfastats_v1.3.8.sif \
+gfastats /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/hifiasm/delivery/filtered.asm.cns.fa \
+-j 8 \
+-t \
+--nstar-report \
+--stats > blobtool_assembly.stats
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/gfastats_v1.3.8.sif \
+gfastats /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/hifiasm/delivery/purged.fa \
+-j 8 \
+-t \
+--nstar-report \
+--stats > purged_assembly.stats
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/gfastats_v1.3.8.sif \
+gfastats /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/HAP1/jordan-zhang-dtg-kea4292-hap1-mb-hirise-jktx1__03-04-2024__final_assembly.fasta \
+-j 8 \
+-t \
+--nstar-report \
+--stats > Hap1_full.stats
+
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/gfastats_v1.3.8.sif \
+gfastats /scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap1/SLF_HAP1_13CHR.fasta \
+-j 8 \
+-t \
+--nstar-report \
+--stats > Hap1_chr.stats
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/gfastats_v1.3.8.sif \
+gfastats /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/HAP2/jordan-kea4292-mb-hirise-yqrtc__03-04-2024__final_assembly.fasta \
+-j 8 \
+-t \
+--nstar-report \
+--stats > Hap2_full.stats
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/gfastats_v1.3.8.sif \
+gfastats /scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap2/SLF_HAP2_13CHR.fasta \
+-j 8 \
+-t \
+--nstar-report \
+--stats > Hap2_chr.stats

@@ -1,0 +1,14 @@
+#!/bin/sh
+#SBATCH --job-name=SLF_BUSCO
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=4
+#SBATCH --mem=50GB
+#SBATCH --time=24:00:00
+
+cd /scratch/work/winchell/Lanternfly/Genome2/Quality/Stats
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/Seqkit_v2.5.1.sif \
+seqkit stats /scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/SLF_Assembly/omnic/DTG-OmniC-966/*.fastq.gz > HiC_Data.stats
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/Seqkit_v2.5.1.sif \
+seqkit stats /scratch/work/winchell/Lanternfly/Genome2/Data/Annotation/RNA/Raw/*.fastq.gz > RNA_Data.stats

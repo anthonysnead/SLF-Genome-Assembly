@@ -1,0 +1,156 @@
+# --- Begin script: 01_trim.sh ---
+#!/bin/bash
+
+#SBATCH --job-name=trim_galore
+#SBATCH --output=trim_galore_%A_%a.out
+#SBATCH --error=trim_galore_%A_%a.err
+#SBATCH --time=12:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=16G
+#SBATCH --array=0-82
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=fm2371@nyu.edu
+
+# Load the module for Trim Galore
+module load trimgalore/0.6.6
+
+# Change to the directory with the FASTQ files
+cd /scratch/fm2371/Winchell/sex/reads
+
+# Create the output directory
+mkdir -p /scratch/fm2371/Winchell/sex/reads/trimmed
+
+# Extract the identifier for the paired-end files
+IDENTIFIER=$(ls n01_*.fastq.gz | sed -n "${SLURM_ARRAY_TASK_ID}p" | sed 's/n01_//' | sed 's/.fastq.gz//')
+
+# Run trim_galore on the paired-end files
+trim_galore --paired --fastqc -j 4 --stringency 3 --length 50 --output_dir /scratch/fm2371/Winchell/sex/reads/trimmed n01_${IDENTIFIER}.fastq.gz n02_${IDENTIFIER}.fastq.gz
+
+# --- End script: 01_trim.sh ---
+
+# --- Begin script: 02_a_BWA_index.sh ---
+#!/bin/bash
+
+#SBATCH --job-name=index
+#SBATCH --output=trim_galore_%A_%a.out
+#SBATCH --error=trim_galore_%A_%a.err
+#SBATCH --time=12:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=128G
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=fm2371@nyu.edu
+
+#module load bwa-mem2/2.1
+
+module load bwa/intel/0.7.17
+
+cd /scratch/fm2371/Winchell/sex/genome/
+
+### Remember to index the genome first always
+bwa index -p SLF_Hap1 SLF_Hap1.fasta
+bwa index -p SLF_Hap2 SLF_Hap2.fasta
+
+# --- End script: 02_a_BWA_index.sh ---
+
+# --- Begin script: 02_alignment.sh ---
+#!/bin/bash
+#SBATCH --job-name=trim_galore
+#SBATCH --output=trim_galore_%A_%a.out
+#SBATCH --error=trim_galore_%A_%a.err
+#SBATCH --time=48:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=64G
+#SBATCH --array=0-81
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=fm2371@nyu.edu
+
+# Load the necessary modules
+module load bwa/intel/0.7.17
+module load samtools/intel/1.14
+
+# Define directories and reference genomes
+TRIMMED_DIR=/scratch/fm2371/Winchell/sex/reads/trimmed
+ALIGNMENT_DIR_HAP1=/scratch/fm2371/Winchell/sex/genome/SLF_Hap1
+ALIGNMENT_DIR_HAP2=/scratch/fm2371/Winchell/sex/genome/SLF_Hap2
+REFERENCE_HAP1=/scratch/fm2371/Winchell/sex/genome/SLF_Hap1
+REFERENCE_HAP2=/scratch/fm2371/Winchell/sex/genome/SLF_Hap2
+COVERAGE_DIR_HAP1=/scratch/fm2371/Winchell/sex/genome/SLF_Hap1/coverage
+COVERAGE_DIR_HAP2=/scratch/fm2371/Winchell/sex/genome/SLF_Hap2/coverage
+
+# Create coverage directories
+mkdir -p $COVERAGE_DIR_HAP1
+mkdir -p $COVERAGE_DIR_HAP2
+
+# Move to the directory containing the trimmed files
+cd $TRIMMED_DIR
+
+# Extract the identifier for the paired-end files
+IDENTIFIER=$(ls n01_*_val_1.fq.gz | sed -n "${SLURM_ARRAY_TASK_ID}p" | sed 's/n01_//' | sed 's/_val_1.fq.gz//')
+
+# Perform alignment and processing for Haplotype 1
+bwa mem -t 8 ${REFERENCE_HAP1} n01_${IDENTIFIER}_val_1.fq.gz n02_${IDENTIFIER}_val_2.fq.gz | \
+samtools view -Sb - > ${ALIGNMENT_DIR_HAP1}/${IDENTIFIER}_Hap1.bam
+
+if [ -f "${ALIGNMENT_DIR_HAP1}/${IDENTIFIER}_Hap1.bam" ]; then
+    samtools sort ${ALIGNMENT_DIR_HAP1}/${IDENTIFIER}_Hap1.bam -o ${ALIGNMENT_DIR_HAP1}/${IDENTIFIER}_Hap1.sorted.bam
+    samtools index ${ALIGNMENT_DIR_HAP1}/${IDENTIFIER}_Hap1.sorted.bam
+
+    # Calculate coverage for Haplotype 1
+    samtools coverage -m -A ${ALIGNMENT_DIR_HAP1}/${IDENTIFIER}_Hap1.sorted.bam > ${COVERAGE_DIR_HAP1}/${IDENTIFIER}_Hap1.histogram.txt
+else
+    echo "Alignment failed for ${IDENTIFIER} on Haplotype 1" >&2
+fi
+
+# Perform alignment and processing for Haplotype 2
+bwa mem -t 8 ${REFERENCE_HAP2} n01_${IDENTIFIER}_val_1.fq.gz n02_${IDENTIFIER}_val_2.fq.gz | \
+samtools view -Sb - > ${ALIGNMENT_DIR_HAP2}/${IDENTIFIER}_Hap2.bam
+
+if [ -f "${ALIGNMENT_DIR_HAP2}/${IDENTIFIER}_Hap2.bam" ]; then
+    samtools sort ${ALIGNMENT_DIR_HAP2}/${IDENTIFIER}_Hap2.bam -o ${ALIGNMENT_DIR_HAP2}/${IDENTIFIER}_Hap2.sorted.bam
+    samtools index ${ALIGNMENT_DIR_HAP2}/${IDENTIFIER}_Hap2.sorted.bam
+
+    # Calculate coverage for Haplotype 2
+    samtools coverage -m -A ${ALIGNMENT_DIR_HAP2}/${IDENTIFIER}_Hap2.sorted.bam > ${COVERAGE_DIR_HAP2}/${IDENTIFIER}_Hap2.histogram.txt
+else
+    echo "Alignment failed for ${IDENTIFIER} on Haplotype 2" >&2
+fi
+# --- End script: 02_alignment.sh ---
+
+# --- Begin script: 03_samtools.sh ---
+#!/bin/bash
+#SBATCH --mem=36GB
+#SBATCH --cpus-per-task=8
+#SBATCH --time=24:00:00
+#SBATCH --array=1-38
+#SBATCH --mail-type=END
+#SBATCH --mail-user=fm2371@nyu.edu
+
+module load samtools/intel/1.14
+
+# Define the directories
+ALIGNMENT_DIR=/scratch/fm2371/Val_2024/02_Alignment
+COVERAGE_DIR=/scratch/fm2371/Val_2024/03_Coverage
+
+# Create the coverage directory if it does not exist
+mkdir -p $COVERAGE_DIR
+
+# Get the list of SAM files
+SAM_FILES=($(ls $ALIGNMENT_DIR/*.sam))
+SAM_FILE=${SAM_FILES[$SLURM_ARRAY_TASK_ID-1]}
+BASENAME=$(basename $SAM_FILE .sam)
+
+# Convert SAM to BAM
+samtools view -b $SAM_FILE > ${ALIGNMENT_DIR}/${BASENAME}.bam
+
+# Sort BAM file
+samtools sort ${ALIGNMENT_DIR}/${BASENAME}.bam -o ${ALIGNMENT_DIR}/${BASENAME}.sorted.bam
+
+# Index BAM file
+samtools index ${ALIGNMENT_DIR}/${BASENAME}.sorted.bam
+
+# Calculate coverage
+# Generate histogram
+samtools coverage -m -A ${ALIGNMENT_DIR}/${BASENAME}.sorted.bam > ${COVERAGE_DIR}/${BASENAME}.histogram.txt

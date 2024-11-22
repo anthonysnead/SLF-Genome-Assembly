@@ -1,0 +1,27 @@
+#!/bin/sh
+#SBATCH --job-name=Juicer
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=32
+#SBATCH --mem=250GB
+#SBATCH --time=72:00:00
+
+singularity exec Containers/juicer_v1.6.2.sif \
+juicer.sh \
+-z /scratch/work/winchell/Lanternfly/Genome2/Juicer/references/SLF_Hap1.fsa \
+-D /opt/juicer \
+-d /scratch/work/winchell/Lanternfly/Genome2/Juicer/Hap1 \
+-p /scratch/work/winchell/Lanternfly/Genome2/Juicer/references/SLF_Hap1.chrom.sizes \
+-s "none" \
+-g SLF_Hap1 \
+-t 32
+
+singularity exec Containers/juicer_v1.6.2.sif \
+juicer.sh \
+-z /scratch/work/winchell/Lanternfly/Genome2/Juicer/references/SLF_Hap2.fsa \
+-D /opt/juicer \
+-d /scratch/work/winchell/Lanternfly/Genome2/Juicer/Hap2 \
+-p /scratch/work/winchell/Lanternfly/Genome2/Juicer/references/SLF_Hap2.chrom.sizes \
+-s "none" \
+-g SLF_Hap2 \
+-t 32 
+

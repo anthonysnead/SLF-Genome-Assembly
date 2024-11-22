@@ -1,0 +1,16 @@
+#!/bin/sh
+#SBATCH --job-name=SLF_Quality
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=32
+#SBATCH --mem=250GB
+#SBATCH --time=4-00:00:00
+
+module load minimap2/2.22
+
+minimap2 -t 32 --split-prefix SLF_Hap1 -ax map-hifi \
+/scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap1/SLF_HAP1_13CHR.fasta \
+/scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/Long_Read/SLF_hifi.fastq.gz > /scratch/work/winchell/Lanternfly/Genome2/Quality/Alignment/Hap1_Chr_assembly.sam
+
+minimap2 -t 32 --split-prefix SLF_Hap2 -ax map-hifi \
+ /scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap2/SLF_HAP2_13CHR.fasta \
+/scratch/work/winchell/Lanternfly/Genome2/Data/Assembly/Long_Read/SLF_hifi.fastq.gz > /scratch/work/winchell/Lanternfly/Genome2/Quality/Alignment/Hap2_Chr_assembly.sam

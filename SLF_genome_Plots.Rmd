@@ -1,0 +1,535 @@
+---
+title: "SLF Genome R Code"
+author: "Anthony Snead"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data for Circa
+
+We use Circa to visualize the genome. This first section is dedicated to calculating the required stats and formatting them for circa.
+
+```{r, Circal Data Manipulation Libraries}
+# Install required packages
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(c("GenomicRanges", "rtracklayer", "Biostrings"))
+
+# Load the libraries
+library(GenomicRanges)
+library(rtracklayer)
+library(Biostrings)
+
+
+```
+
+```{r, functions}
+# create function to calculate gc content
+calculate.gc.content <- function(dna.sequences, window.size) {
+  gc.content.list <- list()
+
+  # Iterate over each sequence (chromosome/contig) in the genome
+  for (i in seq_along(dna.sequences)) {
+    # Extract the current sequence as a DNAString
+    current.seq <- dna.sequences[[i]]
+    
+    # Calculate the sequence length
+    seq.length <- length(current.seq)
+    
+    # Calculate start and end positions for sliding windows
+    starts <- seq(1, seq.length, by = window.size)
+    ends <- pmin(starts + window.size - 1, seq.length)  # Ensure we don't go beyond the sequence length
+    
+    # Calculate GC content in sliding windows for the current sequence
+    gc.content <- letterFrequencyInSlidingView(current.seq, view.width = window.size, 
+                                                letters = "GC", as.prob = TRUE) * 100
+    
+    # Ensure the number of GC content values matches the number of windows
+    if (length(gc.content) != length(starts)) {
+      gc.content <- gc.content[1:length(starts)]
+    }
+    
+    # Store the results in a data frame
+    gc.content.df <- data.frame(
+      chr = names(dna.sequences)[i],  # Chromosome/contig name
+      start = starts,
+      end = ends,
+      gc = gc.content
+    )
+    
+    # Append to the result list
+    gc.content.list[[i]] <- gc.content.df
+  }
+
+  # Combine all results into a single data frame
+  combined.gc.content <- do.call(rbind, gc.content.list)
+  
+  return(combined.gc.content)
+}
+
+# Create a function to calculate gene density in bins of bin.size
+calculate.gene.density <- function(gene.data, bin.size) {
+  # Initialize an empty data frame to store bins and gene counts
+  bins <- data.frame()
+  
+  # Process each chromosome separately
+  for (chr in unique(gene.data$seqnames)) {
+    # Find the length of the current chromosome
+    chr.genes <- gene.data[gene.data$seqnames == chr, ]
+    chr.length <- max(chr.genes$end)
+    
+    # Create bins for the current chromosome
+    chr.bins <- data.frame(
+      chr = chr,
+      start = seq(1, chr.length, by = bin.size),
+      end = pmin(seq(bin.size, chr.length + bin.size, by = bin.size), chr.length)  # Prevent exceeding chromosome length
+    )
+    
+    # Count the number of genes that fall within each bin
+    chr.bins$count <- sapply(1:nrow(chr.bins), function(i) {
+      sum(chr.genes$start <= chr.bins$end[i] & chr.genes$end >= chr.bins$start[i])
+    })
+    
+    # Append the chromosome's bins to the overall bins data frame
+    bins <- rbind(bins, chr.bins)
+  }
+  
+  return(bins)
+}
+
+# Create a function to calculate repeat density in bins of bin_size
+calculate.repeat.density <- function(repeat.data, bin.size) {
+  # Initialize an empty data frame to store bins and repeat counts
+  bins <- data.frame()
+  
+  # Process each chromosome separately
+  for (chr in unique(repeat.data$seqnames)) {
+    # Find the length of the current chromosome
+    chr.repeats <- repeat.data[repeat.data$seqnames == chr, ]
+    chr.length <- max(chr.repeats$end)
+    
+    # Create bins for the current chromosome
+    chr.bins <- data.frame(
+      chr = chr,
+      start = seq(1, chr.length, by = bin.size),
+      end = pmin(seq(bin.size, chr.length + bin.size, by = bin.size), chr.length)  # Prevent exceeding chromosome length
+    )
+    
+    # Count the number of repeats that fall within each bin
+    chr.bins$count <- sapply(1:nrow(chr.bins), function(i) {
+      sum(chr.repeats$start <= chr.bins$end[i] & chr.repeats$end >= chr.bins$start[i])
+    })
+    
+    # Append the chromosome's bins to the overall bins data frame
+    bins <- rbind(bins, chr.bins)
+  }
+  
+  return(bins)
+}
+
+```
+
+```{r, Hap1 Stats}
+# load in gff
+Hap1.gff <- rtracklayer::import(paste0(getwd(), "/Data/SLF_Hap1.gff3"), format = "gff3")
+
+# load in repeat gff
+Hap1.Repeat.gff <- rtracklayer::import(paste0(getwd(), "/Data/SLF_Hap1.fasta.out.gff"), format = "gff3")
+
+# load in fasta
+Hap1.Fasta <-  Biostrings::readDNAStringSet(paste0(getwd(), "/Data/SLF_Hap1.fasta.masked"))
+
+# window size
+window.size = 50000
+
+# get just genes and mRNA
+Hap1.Gene <- subset(Hap1.gff, Hap1.gff$type == "gene" | Hap1.gff$type == "mRNA")
+
+# calcualte repeat density
+Hap1.Repeat.Density <- calculate.repeat.density(as.data.frame(Hap1.Repeat.gff), window.size)
+
+# calculate gene density
+Hap1.Gene.Density <- calculate.gene.density(as.data.frame(Hap1.Gene), window.size)
+
+# calcualte gc content
+Hap1.GC <- calculate.gc.content(Hap1.Fasta, window.size)
+
+```
+
+```{r, Hap2 Stats}
+# load in gff
+Hap2.gff <- rtracklayer::import(paste0(getwd(), "/Data/SLF_Hap2.gff3"), format = "gff3")
+
+# load in repeat gff
+Hap2.Repeat.gff <- rtracklayer::import(paste0(getwd(), "/Data/SLF_Hap2.fasta.out.gff"), format = "gff3")
+
+# load in fasta
+Hap2.Fasta <-  Biostrings::readDNAStringSet(paste0(getwd(), "/Data/SLF_Hap2.fasta.masked"))
+
+# window size
+window.size = 50000
+
+# get genes
+Hap2.Gene <- subset(Hap2.gff, Hap1.gff$type == "gene" | Hap2.gff$type == "mRNA")
+
+# get repeat density
+Hap2.Repeat.Density <- calculate.repeat.density(as.data.frame(Hap2.Repeat.gff), window.size)
+
+# get gene density
+Hap2.Gene.Density <- calculate.gene.density(as.data.frame(Hap2.Gene), window.size)
+
+# get gc content
+Hap2.GC <- calculate.gc.content(Hap2.Fasta, window.size)
+```
+
+```{r,Hap1 Circa files}
+# get chromosome file
+Hap1.Chr <- data.frame(
+  chr = names(Hap1.Fasta),
+  length = width(Hap1.Fasta)) %>%
+  dplyr::mutate(chr = gsub("chr_(\\d+)", "Chr \\1", chr))
+
+# get gene density file
+Hap1.GD <- Hap1.Gene.Density %>%
+  dplyr::mutate(chr = gsub("chr_(\\d+)", "Chr \\1", chr))
+
+# get gc file
+Hap1.GC.Df <- Hap1.GC %>%
+  dplyr::mutate(chr = gsub("chr_(\\d+)", "Chr \\1", chr))
+
+# get repeat density file
+Hap1.Rp <- Hap1.Repeat.Density %>%
+  dplyr::mutate(chr = gsub("chr_(\\d+)", "Chr \\1", chr))
+```
+
+```{r, Hap2 Circa Files}
+# get chromosome file
+Hap2.Chr <- data.frame(
+  chr = names(Hap2.Fasta),
+  length = width(Hap2.Fasta)) %>%
+  dplyr::mutate(chr = gsub("chr_(\\d+)", "Chr \\1", chr))
+
+# get gene density file
+Hap2.GD <- Hap2.Gene.Density %>%
+  dplyr::mutate(chr = gsub("chr_(\\d+)", "Chr \\1", chr))
+
+# get gc file
+Hap2.GC.Df <- Hap2.GC %>%
+  dplyr::mutate(chr = gsub("chr_(\\d+)", "Chr \\1", chr))
+
+# get repeat file
+Hap2.Rp <- Hap2.Repeat.Density %>%
+  dplyr::mutate(chr = gsub("chr_(\\d+)", "Chr \\1", chr))
+
+```
+
+# Busco Graphs
+
+The section plots the BUSCO data on genome completeness. 
+```{r, busco graph}
+# code to make busco graph
+Busco.Df <- read.csv("BUSCO_Results.csv") %>%
+  dplyr::mutate(Classification = factor(Classification, levels = c("Missing (M)",
+                                                                   "Fragmented (F)",
+                                                                   "Complete (C) and Duplicated (D)",
+                                                                   "Complete (C) and Single-copy (S)")))
+
+ggplot(Busco.Df, aes(x = Assembly, y = Percentage, fill = Classification)) +
+  facet_grid(Type ~ Dataset, scales = "free", drop = TRUE) +  # Faceting by Type and Dataset
+  geom_bar(stat = "identity", position = "stack", width = 0.7) +  # Stacked bar chart
+  coord_flip() +  # Flip the axes for horizontal bars
+  labs(title = "BUSCO Assessment Results",
+       x = "Assembly",
+       y = "%BUSCOs") +
+  theme_minimal() +
+  ggsci::scale_fill_npg() +
+  theme(
+    # Remove gridlines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Add an x-axis line (horizontal axis line in a flipped plot)
+    axis.line.x = element_line(color = "black", size = 0.5),  # Add black line on x-axis
+    axis.line.y = element_blank(),  # Remove the y-axis line (since we're using coord_flip
+    # Change text to serif
+    text = element_text(family = "serif"),
+    # Adjust facet label appearance if needed
+    strip.text = element_text(size = 12),  # Facet label size and boldness
+    # Adjust title appearance
+    plot.title = element_text(size = 14, hjust = 0.5)
+  )
+```
+
+# Coverage Plot
+Here is the code we used to visualize the coverage across the chromosomes.
+```{r, code for coverage plot}
+library(tidyverse)
+
+setwd("~/Documents/Documents - Fallon MacBook Pro/SLF_Genome")
+
+# Read the CSV file
+slf_info <- read.csv("2022 SLF Info.csv", header = TRUE)
+
+# Read mean coverages for each chr
+hap1_mean_coverages <- read.table("SLF_Hap1_mean_coverages.txt", header = T)
+hap2_mean_coverages <- read.table("SLF_Hap2_mean_coverages.txt", header = T)
+
+# pivot to wide format with Sample IDs as rows and each Chromosome as a separate column
+hap1_wide <- hap1_mean_coverages %>%
+    pivot_wider(names_from = Chromosome, values_from = Mean_Coverage)
+
+hap2_wide <- hap2_mean_coverages %>%
+    pivot_wider(names_from = Chromosome, values_from = Mean_Coverage)
+
+hap1_wide <- hap1_wide %>%
+    mutate(Sample_ID = gsub("_Hap1\\.histogram\\.txt", "", File))
+
+# Merge hap1_wide with slf_info to replace Sample_ID with fly_ID
+hap1_wide <- hap1_wide %>%
+    left_join(slf_info, by = c("Sample_ID" = "fly_ID"))
+
+hap2_wide <- hap2_wide %>%
+    mutate(Sample_ID = gsub("_Hap2\\.histogram\\.txt", "", File))
+
+# Merge hap1_wide with slf_info to replace Sample_ID with fly_ID
+hap2_wide <- hap2_wide %>%
+    left_join(slf_info, by = c("Sample_ID" = "fly_ID"))
+
+write.csv(hap1_wide, "hap1_wide.csv")
+write.csv(hap2_wide, "hap2_wide.csv")
+
+### Now read the final stats file, where we have the percentage of alignment and coverage for each chrmosome, and the sex info
+slf_Hap1 <- read.csv("SLF_hap1.csv", header = TRUE)
+slf_Hap2 <- read.csv("SLF_hap2.csv", header = TRUE)
+
+# Combine Hap1 and Hap2 data
+combined_data <- bind_rows(
+    slf_Hap1 %>% mutate(Haplotype = "HAP1"),
+    slf_Hap2 %>% mutate(Haplotype = "HAP2")
+)
+
+# Melt the data to long format for coverage
+coverage_data <- combined_data %>%
+    pivot_longer(cols = starts_with("chr_"), names_to = "Chromosome", values_to = "Coverage")
+
+# Set the order of chromosomes on the x-axis
+coverage_data$Chromosome <- factor(coverage_data$Chromosome, levels = paste0("chr_", 1:13))
+
+# plot for each chromosome comparing male and female coverage
+coverage_plot <- ggplot(coverage_data, aes(x = Chromosome, y = Coverage, fill = sex)) +
+  geom_violin(alpha = 0.6, position = position_dodge(width = 0.7)) +
+  stat_summary(fun = mean, geom = "point", shape = 95, size = 4, color = "black", position = position_dodge(width = 0.75)) +
+  facet_wrap(~Haplotype, nrow = 2) +
+  labs(title = "Chromosome Coverage by Sex", x = NULL, y = "Mean Coverage") +
+  scale_fill_manual(values = c("female" = "#ca0020", "male" = "#0571b0")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("Chromosome_Coverage_by_Sex.pdf", plot = coverage_plot, width = 10, height = 6)
+ggsave("Chromosome_Coverage_by_Sex.png", plot = coverage_plot, width = 10, height = 6, dpi = 300)
+
+#Main figure, violin plot for HAP1
+hap1_data <- coverage_data %>% filter(Haplotype == "HAP1")
+plot_hap1 <- ggplot(hap1_data, aes(x = Chromosome, y = Coverage, fill = sex)) +
+    geom_boxplot() +
+    geom_violin(alpha = 0.5, position = position_dodge(width = 0.75)) +
+    labs(title = "Chromosome Coverage by Sex (HAP1)", x = "Chromosome", y = "Coverage") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("Chromosome_Coverage_by_Sex_HAP1.png", plot = plot_hap1, width = 10, height = 6, dpi = 300)
+ggsave("Chromosome_Coverage_by_Sex_HAP1.pdf", plot = plot_hap1, width = 10, height = 6)
+
+# Plot for HAP2
+hap2_data <- coverage_data %>% filter(Haplotype == "HAP2")
+plot_hap2 <- ggplot(hap2_data, aes(x = Chromosome, y = Coverage, fill = sex)) +
+    geom_boxplot() +
+    geom_violin(alpha = 0.5, position = position_dodge(width = 0.75)) +
+    labs(title = "Chromosome Coverage by Sex (HAP2)", x = "Chromosome", y = "Coverage") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Display and save the HAP2 plot
+ggsave("Chromosome_Coverage_by_Sex_HAP2.png", plot = plot_hap2, width = 10, height = 6, dpi = 300)
+ggsave("Chromosome_Coverage_by_Sex_HAP2.pdf", plot = plot_hap2, width = 10, height = 6)
+
+## Subset the data to include only male samples
+male_coverage_data <- coverage_data %>% filter(sex == "male")
+plot_male_coverage <- ggplot(male_coverage_data, aes(x = Chromosome, y = Coverage, fill = Chromosome)) +
+    geom_boxplot() +
+    geom_violin(alpha = 0.5, position = position_dodge(width = 0.75)) +
+    facet_wrap(~Haplotype, nrow = 2) +
+    labs(title = "Chromosome Coverage for Male Samples", x = "Chromosome", y = "Coverage") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+plot_male_individuals <- ggplot(male_coverage_data, aes(x = Chromosome, y = Coverage, color = Haplotype)) +
+    geom_point(size = 3, alpha = 0.7, position = position_dodge(width = 0.5)) +
+    labs(title = "Chromosome Coverage per Male Sample", x = "Chromosome", y = "Coverage") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    facet_wrap(~ Sample_ID, ncol = 4) 
+
+ggsave("Chromosome_Coverage_per_Male_Sample_with_Haplotype.png", plot = plot_male_individuals, width = 16, height = 10, dpi = 300)
+ggsave("Chromosome_Coverage_per_Male_Sample_with_Haplotype.pdf", plot = plot_male_individuals, width = 16, height = 10)
+```
+
+# GO Enrichment
+
+Here we test for gene ontology enrichment across the chromosomes.
+```{r, Go terms - libraries}
+# Load necessary libraries
+library(ape)
+library(goseq)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+
+```{r, format gff}
+# Read the GFF file
+gff_data <- read.gff(file = "SLF_Hap1.gff3", GFF3 = TRUE)
+
+str(gff_data)
+
+# Extract rows with GO terms in the attributes
+gff_data_go <- gff_data %>%
+    filter(grepl("Ontology_term=", attributes)) %>%
+    mutate(
+        GeneID = sub(".*ID=([^;]+).*", "\\1", attributes),         # Extract Gene ID
+        GOterms = sub(".*Ontology_term=([^;]+).*", "\\1", attributes)  # Extract GO terms
+    ) %>%
+    dplyr::select(GeneID, GOterms)
+
+# Extract rows where type is "mRNA", that's where you can find the parentID (the real geneID)
+gff_mrna <- gff_data %>%
+    filter(type == "mRNA") %>%
+    mutate(
+        mRNA_ID = sub(".*ID=([^;]+).*", "\\1", attributes),
+        Parent_ID = sub(".*Parent=([^;]+).*", "\\1", attributes)
+    ) %>%
+    dplyr::select(mRNA_ID, Parent_ID)
+
+# View the mRNA and Parent gene IDs (start with ACEB)
+head(gff_mrna)
+
+# Merge the GO term data (gff_data_go) with the mRNA-Parent mappings
+gff_data_go_with_aceb <- gff_data_go %>%
+    left_join(gff_mrna, by = c("GeneID" = "mRNA_ID")) %>%
+    dplyr::select(Parent_ID, GOterms)
+
+# View the updated gene-to-GO mapping
+head(gff_data_go_with_aceb)
+
+# split multiple GO terms
+gene2go <- gff_data_go_with_aceb %>%
+    separate_rows(GOterms, sep = ",")
+
+# Remove duplicates from gene2go
+gene2go_deduplicated <- distinct(gene2go)
+gene2go_deduplicated <- as.data.frame(gene2go_deduplicated)
+```
+
+
+```{r, GO term Analysis Function}
+# Define a function to perform GOseq analysis for each chromosome
+perform_goseq_per_chromosome <- function(chromosome_number, gff_data, gene2go_deduplicated) {
+    # Extract gene IDs for the specific chromosome
+    chr_genes <- gff_data %>%
+        filter(seqid == paste0("chr_", chromosome_number) & type == "gene") %>%
+        mutate(GeneID = sub(".*ID=([^;]+).*", "\\1", attributes)) %>%
+        dplyr::select(GeneID)
+    
+    # Convert to a vector
+    chr_gene_list <- chr_genes$GeneID
+    
+    # Extract all genes from the GFF file
+    all_genes <- gff_data %>%
+        filter(type == "gene") %>%
+        mutate(GeneID = sub(".*ID=([^;]+).*", "\\1", attributes)) %>%
+        dplyr::select(GeneID)
+    
+    # Create a binary vector where 1 = gene on the chromosome, 0 = gene not on the chromosome
+    gene_vector <- as.integer(all_genes$GeneID %in% chr_gene_list)
+    names(gene_vector) <- all_genes$GeneID
+    
+    # Create the PWF using the actual gene lengths
+    pwf <- nullp(gene_vector, bias.data = gene_lengths, plot.fit = FALSE)
+    
+    # Run GOseq
+    GO_results <- goseq(pwf, gene2cat = gene2go_deduplicated)
+    
+    # Save the GO results as CSV
+    write.csv(GO_results, file = paste0("GO_results_chr_", chromosome_number, ".csv"), row.names = FALSE)
+    
+    # Filter for GO terms with valid descriptions and significant p-values
+    GO_results_filtered <- GO_results %>%
+        filter(!is.na(term) & over_represented_pvalue < 0.05)
+    
+    # Select the top 20 most significant GO terms
+    top_GO <- GO_results_filtered %>%
+        arrange(over_represented_pvalue) %>%
+        head(20)
+    
+    # Create the bar plot with color coding by Ontology type
+    plot <- ggplot(top_GO, aes(x = reorder(term, -over_represented_pvalue), 
+                               y = -log10(over_represented_pvalue), fill = ontology)) +
+        geom_bar(stat = "identity") +
+        coord_flip() +
+        scale_fill_manual(values = c("MF" = "#66c2a5", "BP" = "#fc8d62", "CC" = "#8da0cb")) + # Custom colors
+        labs(title = paste0("Top 20 GO Terms for chr_", chromosome_number, " by Significance"),
+             x = "GO Term",
+             y = "-log10(p-value)",
+             fill = "Ontology") +
+        theme_minimal()
+    
+    # Save the plot as PNG
+    ggsave(paste0("GO_plot_chr_", chromosome_number, ".png"), plot = plot, width = 8, height = 6)
+}
+```
+
+```{r, Go term analysis}
+# Apply the function for chromosomes 1 to 13
+for (chr in 1:13) {
+    perform_goseq_per_chromosome(chr, gff_data, gene2go_deduplicated)
+}
+```
+
+# Chromosome 12 Annotation
+
+Due to the results from the GO enrichment analysis above, we wanted to dive deeper into chromosome 12. Here we crease a csv to allow deeper investiagation. 
+```{r, Chr 12 Annotation}
+# For more in-depth examination of chromosome 12, we used the following code to produce a csv with relevant information
+
+# get chromosome 12 mrna and gene
+Hap1.chr.12 <- as(Hap1.gff, "data.frame") %>%
+  dplyr::filter(seqnames == "chr_12" & (type == "mRNA" | type == "gene"))
+
+# loop through to flatten the file into a csv
+for (i in 1:ncol(Hap1.chr.12)) {
+  if (is.list(Hap1.chr.12[[i]])) {
+    Hap1.chr.12[[i]] <- sapply(Hap1.chr.12[[i]], function(x) {
+      if (is.list(x)) {
+        # Flatten the list and paste elements into a single string
+        paste(unlist(x), collapse = ", ")
+      } else {
+        as.character(x)  # Ensure it's character type
+      }
+    })
+  }
+}
+
+# convert list elements to characters
+Hap1.chr.12 <- lapply(Hap1.chr.12, function(x) if (is.list(x)) as.character(x) else x)
+
+# make data frame
+Hap1.chr.12 <- as.data.frame(Hap1.chr.12, stringsAsFactors = FALSE)
+
+# Replace character(0) with NA
+Hap1.chr.12[Hap1.chr.12 == "character(0)"] <- NA
+```

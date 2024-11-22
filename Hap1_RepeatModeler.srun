@@ -1,0 +1,15 @@
+#!/bin/bash
+#SBATCH --job-name Hap1_RepeatModeler
+#SBATCH --cpus-per-task 48
+#SBATCH --mem=200GB
+#SBATCH --time=2-00:00:00
+
+cd Assembly/Masked/Hap1/Database
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/tetools_v1.87.sif \
+BuildDatabase -name "Lanternfly"  "/scratch/work/winchell/Lanternfly/Genome2/Assembly/Raw/Hap1/SLF_Hap1.fasta"
+
+cd /scratch/work/winchell/Lanternfly/Genome2/Assembly/Masked/Hap1/RepeatModeler/
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/tetools_v1.87.sif \
+RepeatModeler -threads 48 -database /scratch/work/winchell/Lanternfly/Genome2/Assembly/Masked/Hap1/Database/Lanternfly  -LTRStruct > "Lanternfly.out"

@@ -1,0 +1,85 @@
+Type,Assembly,Haplotype,Dataset,Classification,Number,Total,Percentage
+Assembly,PreScaffold,Unphased,Arthropoda,Complete (C) and Single-copy (S),853,1013,84.21
+Assembly,PreScaffold,Unphased,Arthropoda,Complete (C) and Duplicated (D),146,1013,14.41
+Assembly,PreScaffold,Unphased,Arthropoda,Fragmented (F),2,1013,0.2
+Assembly,PreScaffold,Unphased,Arthropoda,Missing (M),12,1013,1.18
+Assembly,PreScaffold,Unphased,Eukaryota,Complete (C) and Single-copy (S),222,255,87.06
+Assembly,PreScaffold,Unphased,Eukaryota,Complete (C) and Duplicated (D),33,255,12.94
+Assembly,PreScaffold,Unphased,Eukaryota,Fragmented (F),0,255,0
+Assembly,PreScaffold,Unphased,Eukaryota,Missing (M),0,255,0
+Assembly,PreScaffold,Unphased,Insecta,Complete (C) and Single-copy (S),1143,1367,83.61
+Assembly,PreScaffold,Unphased,Insecta,Complete (C) and Duplicated (D),204,1367,14.92
+Assembly,PreScaffold,Unphased,Insecta,Fragmented (F),5,1367,0.37
+Assembly,PreScaffold,Unphased,Insecta,Missing (M),15,1367,1.1
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Arthropoda,Complete (C) and Single-copy (S),807,1013,79.66
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Arthropoda,Complete (C) and Duplicated (D),201,1013,19.84
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Arthropoda,Fragmented (F),4,1013,0.39
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Arthropoda,Missing (M),1,1013,0.1
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Eukaryota,Complete (C) and Single-copy (S),200,255,78.43
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Eukaryota,Complete (C) and Duplicated (D),54,255,21.18
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Eukaryota,Fragmented (F),1,255,0.39
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Eukaryota,Missing (M),0,255,0
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Insecta,Complete (C) and Single-copy (S),1074,1367,78.57
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Insecta,Complete (C) and Duplicated (D),283,1367,20.7
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Insecta,Fragmented (F),3,1367,0.22
+Assembly,Hi-C Scaffolded Haplotype 1,Haplotype 1,Insecta,Missing (M),7,1367,0.51
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Arthropoda,Complete (C) and Single-copy (S),898,1013,88.65
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Arthropoda,Complete (C) and Duplicated (D),112,1013,11.06
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Arthropoda,Fragmented (F),2,1013,0.2
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Arthropoda,Missing (M),1,1013,0.11
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Eukaryota,Complete (C) and Single-copy (S),225,255,88.24
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Eukaryota,Complete (C) and Duplicated (D),30,255,11.76
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Eukaryota,Fragmented (F),0,255,0
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Eukaryota,Missing (M),0,255,0
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Insecta,Complete (C) and Single-copy (S),1195,1367,87.42
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Insecta,Complete (C) and Duplicated (D),165,1367,12.07
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Insecta,Fragmented (F),3,1367,0.22
+Assembly,Hi-C Scaffolded Haplotype 2,Haplotype 2,Insecta,Missing (M),4,1367,0.29
+Assembly,Cleaned Haplotype 1,Haplotype 1,Arthropoda,Complete (C) and Single-copy (S),996,1013,98.32
+Assembly,Cleaned Haplotype 1,Haplotype 1,Arthropoda,Complete (C) and Duplicated (D),10,1013,0.99
+Assembly,Cleaned Haplotype 1,Haplotype 1,Arthropoda,Fragmented (F),2,1013,0.2
+Assembly,Cleaned Haplotype 1,Haplotype 1,Arthropoda,Missing (M),5,1013,0.49
+Assembly,Cleaned Haplotype 1,Haplotype 1,Eukaryota,Complete (C) and Single-copy (S),249,255,97.65
+Assembly,Cleaned Haplotype 1,Haplotype 1,Eukaryota,Complete (C) and Duplicated (D),4,255,1.57
+Assembly,Cleaned Haplotype 1,Haplotype 1,Eukaryota,Fragmented (F),0,255,0
+Assembly,Cleaned Haplotype 1,Haplotype 1,Eukaryota,Missing (M),2,255,0.78
+Assembly,Cleaned Haplotype 1,Haplotype 1,Insecta,Complete (C) and Single-copy (S),1337,1367,97.81
+Assembly,Cleaned Haplotype 1,Haplotype 1,Insecta,Complete (C) and Duplicated (D),15,1367,1.1
+Assembly,Cleaned Haplotype 1,Haplotype 1,Insecta,Fragmented (F),4,1367,0.29
+Assembly,Cleaned Haplotype 1,Haplotype 1,Insecta,Missing (M),11,1367,0.8
+Assembly,Cleaned Haplotype 2,Haplotype 2,Arthropoda,Complete (C) and Single-copy (S),991,1013,97.83
+Assembly,Cleaned Haplotype 2,Haplotype 2,Arthropoda,Complete (C) and Duplicated (D),1,1013,1.18
+Assembly,Cleaned Haplotype 2,Haplotype 2,Arthropoda,Fragmented (F),1,1013,0.1
+Assembly,Cleaned Haplotype 2,Haplotype 2,Arthropoda,Missing (M),9,1013,0.89
+Assembly,Cleaned Haplotype 2,Haplotype 2,Eukaryota,Complete (C) and Single-copy (S),250,255,98.04
+Assembly,Cleaned Haplotype 2,Haplotype 2,Eukaryota,Complete (C) and Duplicated (D),4,255,1.57
+Assembly,Cleaned Haplotype 2,Haplotype 2,Eukaryota,Fragmented (F),0,255,0
+Assembly,Cleaned Haplotype 2,Haplotype 2,Eukaryota,Missing (M),1,255,0.39
+Assembly,Cleaned Haplotype 2,Haplotype 2,Insecta,Complete (C) and Single-copy (S),1334,1367,97.59
+Assembly,Cleaned Haplotype 2,Haplotype 2,Insecta,Complete (C) and Duplicated (D),17,1367,1.24
+Assembly,Cleaned Haplotype 2,Haplotype 2,Insecta,Fragmented (F),3,1367,0.22
+Assembly,Cleaned Haplotype 2,Haplotype 2,Insecta,Missing (M),13,1367,0.95
+Annotation,Cleaned Haplotype 1,Haplotype 1,Arthropoda,Complete (C) and Single-copy (S),874,1013,86.28
+Annotation,Cleaned Haplotype 1,Haplotype 1,Arthropoda,Complete (C) and Duplicated (D),121,1013,11.94
+Annotation,Cleaned Haplotype 1,Haplotype 1,Arthropoda,Fragmented (F),4,1013,0.39
+Annotation,Cleaned Haplotype 1,Haplotype 1,Arthropoda,Missing (M),14,1013,1.38
+Annotation,Cleaned Haplotype 1,Haplotype 1,Eukaryota,Complete (C) and Single-copy (S),220,255,86.27
+Annotation,Cleaned Haplotype 1,Haplotype 1,Eukaryota,Complete (C) and Duplicated (D),33,255,12.94
+Annotation,Cleaned Haplotype 1,Haplotype 1,Eukaryota,Fragmented (F),0,255,0
+Annotation,Cleaned Haplotype 1,Haplotype 1,Eukaryota,Missing (M),2,255,0.78
+Annotation,Cleaned Haplotype 1,Haplotype 1,Insecta,Complete (C) and Single-copy (S),1169,1367,85.52
+Annotation,Cleaned Haplotype 1,Haplotype 1,Insecta,Complete (C) and Duplicated (D),158,1367,11.56
+Annotation,Cleaned Haplotype 1,Haplotype 1,Insecta,Fragmented (F),7,1367,0.51
+Annotation,Cleaned Haplotype 1,Haplotype 1,Insecta,Missing (M),33,1367,2.41
+Annotation,Cleaned Haplotype 2,Haplotype 2,Arthropoda,Complete (C) and Single-copy (S),871,1013,85.98
+Annotation,Cleaned Haplotype 2,Haplotype 2,Arthropoda,Complete (C) and Duplicated (D),121,1013,11.94
+Annotation,Cleaned Haplotype 2,Haplotype 2,Arthropoda,Fragmented (F),3,1013,0.3
+Annotation,Cleaned Haplotype 2,Haplotype 2,Arthropoda,Missing (M),18,1013,1.78
+Annotation,Cleaned Haplotype 2,Haplotype 2,Eukaryota,Complete (C) and Single-copy (S),222,255,87.06
+Annotation,Cleaned Haplotype 2,Haplotype 2,Eukaryota,Complete (C) and Duplicated (D),29,255,11.37
+Annotation,Cleaned Haplotype 2,Haplotype 2,Eukaryota,Fragmented (F),3,255,1.18
+Annotation,Cleaned Haplotype 2,Haplotype 2,Eukaryota,Missing (M),1,255,0.39
+Annotation,Cleaned Haplotype 2,Haplotype 2,Insecta,Complete (C) and Single-copy (S),1168,1367,85.44
+Annotation,Cleaned Haplotype 2,Haplotype 2,Insecta,Complete (C) and Duplicated (D),153,1367,11.19
+Annotation,Cleaned Haplotype 2,Haplotype 2,Insecta,Fragmented (F),0.51,1367,0.51
+Annotation,Cleaned Haplotype 2,Haplotype 2,Insecta,Missing (M),2.85,1367,2.85

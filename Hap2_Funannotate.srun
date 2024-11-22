@@ -1,0 +1,20 @@
+#!/bin/sh
+#SBATCH --job-name=SLF_Funannotate_Hap2
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --mem=50GB
+#SBATCH --time=5:00:00
+
+cd /scratch/work/winchell/Lanternfly/Genome2/Annotation/Hap2/Functional/
+
+singularity exec --bind /scratch/work/winchell/Lanternfly/Genome2/Data/Annotation/busco:/opt/databases \
+    /scratch/work/winchell/Lanternfly/Genome2/Containers/funannotate_v1.8.17.sif \
+    funannotate annotate \
+    --gff SLF_Hap2.gff3 \
+    --fasta SLF_Hap2_Cleaned.fsa \
+    --species "Lycorma delicatula" \
+   --eggnog eggnog_output.emapper.annotations \
+   --iprscan interpro_output/Hap2.faa.xml  \
+    --out funannotate \
+    --busco_db insecta \
+    --cpus 8  

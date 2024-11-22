@@ -1,0 +1,9 @@
+#!/bin/sh
+#SBATCH --job-name=SLF_Genome
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=50GB
+#SBATCH --time=05:00:00
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/genomescope_v2.sif \
+genomescope2 -i /scratch/work/winchell/Lanternfly/Genome2/Kmer_Profiling/Input_kmer_hist -o /scratch/work/winchell/Lanternfly/Genome2/Kmer_Profiling -k 31 --ploidy 2

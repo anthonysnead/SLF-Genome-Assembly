@@ -1,0 +1,21 @@
+#!/bin/sh
+#SBATCH --job-name=Meryl
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=32
+#SBATCH --mem=200GB
+#SBATCH --time=2-00:00:00
+
+cd Data/Assembly/Long_Read/
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/meryl_v1.4.1.sif \
+meryl count \
+[k=31 memory=200 threads=32 SLF_hifi.fastq.gz output meryldb]
+
+cp -r meryldb/ /scratch/work/winchell/Lanternfly/Genome2/Kmer_Profiling/.
+
+rm -rf meryldb/
+
+cd /scratch/work/winchell/Lanternfly/Genome2/Kmer_Profiling/
+
+singularity exec /scratch/work/winchell/Lanternfly/Genome2/Containers/meryl_v1.4.1.sif \
+meryl histogram meryldb > Input_kmer_hist
