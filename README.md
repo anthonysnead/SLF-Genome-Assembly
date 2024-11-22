@@ -1,4 +1,4 @@
-# <p align="center"> Repository <p> <p align="center">Diploid Chromosome-scale genome assembly and annotation of the spotted lanternfly <i>Lycorma delicatula(/i)<center></p>
+# <p align="center"> Repository <p> <p align="center">Diploid Chromosome-scale genome assembly and annotation of the spotted lanternfly <i>Lycorma delicatula</i)><center></p>
 ### <p>Authors</p>
 #### <p align="left">Anthony A Snead<sup>1</sup>, Fallon Meng<sup>1</sup>, John C Avise<sup>2</sup>, Kristin Winchell<sup>1</sup>, Bruce J Turner<sup>4</sup></sup>
 
